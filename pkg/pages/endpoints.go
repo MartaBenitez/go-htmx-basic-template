@@ -142,6 +142,7 @@ func NewMongoDB() *mongo.Client {
 }
 func loadBussinessLine(textoServidor string) string {
 	var introducir = DataIn{_id: primitive.NewObjectID(), Texto: textoServidor}
+	log.Println(introducir)
 	err := SaveJSONData(NewMongoDB(), "copilot", "responses", introducir)
 	if err != nil {
 		return introducir._id.Hex()

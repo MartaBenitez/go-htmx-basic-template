@@ -13,4 +13,5 @@ type ResultSections struct {
 	ProductPaymentMethod       string `json:"ProductPaymentMethod"`
 	ProductRenewalCycle        string `json:"ProductRenewalCycle"`
 	RenewalParameter           string `json:"RenewalParameter"`
+	
 }

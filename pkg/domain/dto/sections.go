@@ -7,7 +7,10 @@ type SectionsToEdit struct {
 }
 
 type ResultSections struct {
-	AdditionalProp1 string `json:"additionalProp1"`
-	AdditionalProp2 string `json:"additionalProp2"`
-	AdditionalProp3 string `json:"additionalProp3"`
+	BusinessLine               string `json:"BusinessLine"`
+	BusinessLineData           string `json:"BusinessLineData"`
+	CommercialNetworkAttribute string `json:"CommercialNetworkAttribute"`
+	ProductPaymentMethod       string `json:"ProductPaymentMethod"`
+	ProductRenewalCycle        string `json:"ProductRenewalCycle"`
+	RenewalParameter           string `json:"RenewalParameter"`
 }

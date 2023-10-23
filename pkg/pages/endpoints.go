@@ -11,11 +11,15 @@ import (
 	"os"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/labstack/echo/v4"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"golang.org/x/text/runes"
+	"golang.org/x/text/transform"
+	"golang.org/x/text/unicode/norm"
 	"htmx.try/m/v2/pkg/dbconn"
 	"htmx.try/m/v2/pkg/domain"
 	"htmx.try/m/v2/pkg/domain/dto"
@@ -89,7 +93,6 @@ func CloseActions(c echo.Context) error {
 
 func GetBussinessLine(c echo.Context) error {
 	user := c.FormValue("user")
-	log.Println(user)
 	respuesta := getLastResponse(user)
 	if respuesta == nil {
 		log.Println("No hay respuesta")
@@ -100,10 +103,21 @@ func GetBussinessLine(c echo.Context) error {
 		log.Println("No hay mensaje del servidor")
 		return nil
 	}
-	loadBussinessLine(*respuesta, mensajeServidor.Question.Text)
+	string, _ := normalize(mensajeServidor.Answer.Text)
+	loadBussinessLine(string)
 
 	return nil
 
+}
+
+var normalizer = transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
+
+func normalize(str string) (string, error) {
+	s, _, err := transform.String(normalizer, str)
+	if err != nil {
+		return "", err
+	}
+	return strings.ToLower(s), err
 }
 
 func NewMongoDB() *mongo.Client {
@@ -126,8 +140,8 @@ func NewMongoDB() *mongo.Client {
 
 	return client
 }
-func loadBussinessLine(respuesta domain.Response, textoServidor string) string {
-	var introducir = DataIn{_id: primitive.NewObjectID(), texto: textoServidor}
+func loadBussinessLine(textoServidor string) string {
+	var introducir = DataIn{_id: primitive.NewObjectID(), Texto: textoServidor}
 	err := SaveJSONData(NewMongoDB(), "copilot", "responses", introducir)
 	if err != nil {
 		return introducir._id.Hex()
@@ -137,10 +151,10 @@ func loadBussinessLine(respuesta domain.Response, textoServidor string) string {
 
 type DataIn struct {
 	_id   primitive.ObjectID
-	texto string
+	Texto string
 }
 
-func SaveJSONData(client *mongo.Client, databaseName string, collectionName string, data interface{}) error {
+func SaveJSONData(client *mongo.Client, databaseName string, collectionName string, data DataIn) error {
 	// Get a handle for your collection
 	collection := client.Database(databaseName).Collection(collectionName)
 
@@ -198,8 +212,6 @@ func generateMessage(user string, module string) {
 		if !val.IsAnswered {
 			resp := requestAnswer(conversaciones[pos].Question, user, module)
 			var response string
-			//response = "Respuesta del servidor"
-			//resp := &response
 
 			if resp == nil {
 				response = "Ha ocurrido un error"
@@ -248,7 +260,7 @@ func requestAnswer(message domain.Message, user string, module string) *string {
 
 	producto := base.Result.Business_line_data.Business_line.Producto
 	var props []string
-	props = append(props, sections.Result.AdditionalProp1, sections.Result.AdditionalProp2, sections.Result.AdditionalProp3)
+	props = append(props, sections.Result.BusinessLine, sections.Result.BusinessLineData, sections.Result.RenewalParameter, sections.Result.CommercialNetworkAttribute, sections.Result.ProductPaymentMethod, sections.Result.ProductRenewalCycle)
 	mensaje := fmt.Sprintf("Si te he entendido correctamente, quieres que realice cambios sobre la linea de negocio %s, sobre las siguientes secciones:\n -%v", producto, props)
 	//Guardamos respuesta en base de datos
 	response := domain.NewResponse(props, base.Result.Business_line_data)
@@ -272,8 +284,7 @@ func getBase(message string) (*dto.Base, error) {
 	res, err := http.Get(url + "base?query=" + message)
 	if err != nil {
 		log.Println("Impossible to build request: " + err.Error())
-		return recoverExample(), nil
-		//return nil, err
+		return nil, err
 	}
 	if res.StatusCode == 200 {
 		resBody, err := io.ReadAll(res.Body)
@@ -289,13 +300,11 @@ func getBase(message string) (*dto.Base, error) {
 			return nil, err
 		}
 		return &response, nil
-	} else {
-		return recoverExample(), nil
 	}
 
-	/*error := errors.New("Error: response received with status code " + res.Status)
+	error := errors.New("Error: response received with status code " + res.Status)
 	log.Println(error.Error())
-	return nil, error*/
+	return nil, error
 
 }
 
@@ -312,16 +321,12 @@ func getSections(message string, module string) (*dto.SectionsToEdit, error) {
 			log.Println("Impossible to read all body of response " + err.Error())
 			return nil, err
 		}
-
 		var response dto.SectionsToEdit
 		err = json.Unmarshal(resBody, &response)
 		if err != nil {
 			log.Println("Impossible to parse the response " + err.Error())
 			return nil, err
 		}
-		log.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-		log.Println(response)
-		log.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
 
 		return &response, nil
 	}

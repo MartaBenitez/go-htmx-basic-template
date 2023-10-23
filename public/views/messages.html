@@ -16,9 +16,9 @@
                 <span class="message-text">{{ .Answer.Text }}
                     {{ if .IsLast}}
                     <div id="buttonsResp" class="{{ .Actions }}">
-                        <button id="buttonAccept" hx-get="/acceptPrompt" hx-target="body"
+                        <button id="buttonAccept" hx-get="/acceptPrompt?user={{$.User}}" hx-target="body"
                             hx-swap="outerHTML">Aceptar</button>
-                        <button id="buttonCancel" hx-get="/ignorePrompt" hx-target="body"
+                        <button id="buttonCancel" hx-get="/ignorePrompt?user={{$.User}}" hx-target="body"
                             hx-swap="outerHTML">Cancelar</button>
                     </div>
                     {{ end }}

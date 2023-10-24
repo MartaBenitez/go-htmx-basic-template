@@ -8,7 +8,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 	"unicode"
@@ -16,7 +15,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
@@ -31,7 +29,7 @@ var url = "http://manuelsanchez.sisnet360.com:8082/"
 
 func Index(c echo.Context) error {
 	user := c.QueryParam("user")
-	conversaciones := getConversations(user)
+	conversaciones := GetConversations(user)
 
 	return c.Render(200, template, domain.InterfaceResponseFull{
 		User:          user,
@@ -43,10 +41,11 @@ func StartNewConversation(c echo.Context) error {
 	user := c.QueryParam("user")
 	conn.DeleteData(user)
 	conn.DeleteResponses(user)
-	conversaciones := getConversations(user)
+	conversaciones := GetConversations(user)
 	return c.Render(200, template, domain.InterfaceResponseFull{
 		User:          user,
 		Conversations: conversaciones,
+		Id:            "",
 	})
 }
 
@@ -60,13 +59,13 @@ func AddMessage(c echo.Context) error {
 	answ := domain.NewMessage("", "")
 
 	conversacion := domain.NewConversation(quest, answ, false, "invisible", true)
-	var conversaciones = getConversations(user)
+	var conversaciones = GetConversations(user)
 	if len(conversaciones) > 0 {
 		indiceUltimo := len(conversaciones) - 1
 		conversaciones[indiceUltimo].IsLast = false
 	}
 	conversaciones = append(conversaciones, conversacion)
-	var cosas = getFullConn(user)
+	var cosas = GetFullConn(user)
 
 	cosas.Conversations = conversaciones
 	conn.SetData(user, cosas)
@@ -76,38 +75,49 @@ func AddMessage(c echo.Context) error {
 	return c.Render(http.StatusOK, template, domain.InterfaceResponseFull{
 		User:          user,
 		Conversations: conversaciones,
+		Id:            "",
 	})
 }
 
 func CloseActions(c echo.Context) error {
 	user := c.FormValue("user")
-	conversaciones := getConversations(user)
+	conversaciones := GetConversations(user)
 	indice := len(conversaciones) - 1
 	conversaciones[indice].Actions = "invisible"
 
 	return c.Render(http.StatusOK, template, domain.InterfaceResponseFull{
 		User:          user,
 		Conversations: conversaciones,
+		Id:            "",
 	})
 }
 
 func GetBussinessLine(c echo.Context) error {
 	user := c.FormValue("user")
-	respuesta := getLastResponse(user)
+	respuesta := GetLastResponse(user)
 	if respuesta == nil {
 		log.Println("No hay respuesta")
 		return nil
 	}
-	mensajeServidor := getLastConversation(user)
+	mensajeServidor := GetLastConversation(user)
 	if mensajeServidor == nil {
 		log.Println("No hay mensaje del servidor")
 		return nil
 	}
 	string, _ := normalize(mensajeServidor.Answer.Text)
-	loadBussinessLine(string)
+	id := loadBussinessLine(string, respuesta)
+	conversaciones := GetConversations(user)
 
-	return nil
+	return c.Render(http.StatusOK, template, domain.InterfaceResponseFull{
+		User:          user,
+		Conversations: conversaciones,
+		Id:            id,
+	})
+}
 
+type RespRed struct {
+	_id   string
+	Texto string
 }
 
 var normalizer = transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
@@ -120,39 +130,19 @@ func normalize(str string) (string, error) {
 	return strings.ToLower(s), err
 }
 
-func NewMongoDB() *mongo.Client {
-	// Set client options
-	clientOptions := options.Client().ApplyURI("mongodb://root:example@20.56.93.5:27017")
-
-	// Connect to MongoDB
-	client, err := mongo.Connect(context.Background(), clientOptions)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// Check the connection
-	err = client.Ping(context.Background(), nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println("Connected to MongoDB!")
-
-	return client
+type DataIn struct {
+	_id      primitive.ObjectID
+	Texto    string
+	Producto *domain.Response
 }
-func loadBussinessLine(textoServidor string) string {
-	var introducir = DataIn{_id: primitive.NewObjectID(), Texto: textoServidor}
-	log.Println(introducir)
+
+func loadBussinessLine(textoServidor string, respuesta *domain.Response) string {
+	var introducir = DataIn{_id: primitive.NewObjectID(), Texto: textoServidor, Producto: respuesta}
 	err := SaveJSONData(NewMongoDB(), "copilot", "responses", introducir)
 	if err != nil {
 		return introducir._id.Hex()
 	}
-	return ""
-}
-
-type DataIn struct {
-	_id   primitive.ObjectID
-	Texto string
+	return introducir._id.Hex()
 }
 
 func SaveJSONData(client *mongo.Client, databaseName string, collectionName string, data DataIn) error {
@@ -169,45 +159,9 @@ func SaveJSONData(client *mongo.Client, databaseName string, collectionName stri
 	return nil
 }
 
-func getLastResponse(user string) *domain.Response {
-	vals, ok := conn.GetResponses(user)
-	if !ok {
-		return nil
-	}
-	val := vals[len(vals)-1]
-	return &val
-}
-
-func getLastConversation(user string) *domain.Conversation {
-	vals := getConversations(user)
-	for _, val := range vals {
-		if val.IsLast {
-			return &val
-		}
-	}
-	return nil
-}
-
-func getFullConn(user string) domain.InterfaceResponseFull {
-	//get the user conversations from the database
-	val, ok := conn.GetData(user)
-	if !ok {
-		return domain.InterfaceResponseFull{}
-	}
-	return val
-}
-
-func getConversations(user string) []domain.Conversation {
-	val, ok := conn.GetData(user)
-	if !ok {
-		return []domain.Conversation{}
-	}
-	return val.Conversations
-}
-
 func generateMessage(user string, module string) {
 	time.Sleep(1 * time.Second)
-	var conversaciones = getConversations(user)
+	var conversaciones = GetConversations(user)
 
 	for pos, val := range conversaciones {
 		if !val.IsAnswered {
@@ -222,22 +176,12 @@ func generateMessage(user string, module string) {
 			}
 			conversaciones[pos].Answer = domain.Message{Text: response, Time: time.Now().Format("15:04:05")}
 			conversaciones[pos].IsAnswered = true
-			var updatedConv = getFullConn(user)
+			var updatedConv = GetFullConn(user)
 			updatedConv.Conversations = conversaciones
 			conn.SetData(user, updatedConv)
 			return
 		}
 	}
-}
-
-func recoverExample() *dto.Base {
-	var respuesta dto.Base
-	raw, err := os.ReadFile("/home/usuario/Escritorio/ejemplo.json")
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-	json.Unmarshal(raw, &respuesta)
-	return &respuesta
 }
 
 func requestAnswer(message domain.Message, user string, module string) *string {
@@ -260,8 +204,8 @@ func requestAnswer(message domain.Message, user string, module string) *string {
 	}
 
 	producto := base.Result.Business_line_data.Business_line.Producto
-	var props []string
-	props = append(props, sections.Result.BusinessLine, sections.Result.BusinessLineData, sections.Result.RenewalParameter, sections.Result.CommercialNetworkAttribute, sections.Result.ProductPaymentMethod, sections.Result.ProductRenewalCycle)
+
+	props := AppendProps(sections.Result)
 	mensaje := fmt.Sprintf("Si te he entendido correctamente, quieres que realice cambios sobre la linea de negocio %s, sobre las siguientes secciones:\n -%v", producto, props)
 	//Guardamos respuesta en base de datos
 	response := domain.NewResponse(props, base.Result.Business_line_data)

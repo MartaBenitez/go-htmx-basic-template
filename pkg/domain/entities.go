@@ -3,6 +3,7 @@ package domain
 type InterfaceResponseFull struct {
 	User          string
 	Conversations []Conversation
+	Id            string
 }
 
 type Conversation struct {

@@ -13,17 +13,17 @@
             </div>
             {{if .IsAnswered}}
             <div class="message-server">
-                <span class="message-text">{{ .Answer.Text }}
+                <span class="message-text">{{ .Answer.Text }}</span>
                     {{ if .IsLast}}
                     <div id="buttonsResp" class="{{ .Actions }}">
                         <button id="buttonAccept" hx-get="/acceptPrompt?user={{$.User}}" hx-target="body"
-                            hx-swap="outerHTML">Aceptar</button>
+                        hx-swap="outerHTML">Aceptar</button>
                         <button id="buttonCancel" hx-get="/ignorePrompt?user={{$.User}}" hx-target="body"
                             hx-swap="outerHTML">Cancelar</button>
                     </div>
+                    <div class="result">{{$.Id}}</div>
                     {{ end }}
                     <br><span class="message-time">{{ .Answer.Time }}</span>
-                </span>
             </div>
             {{else}}
             <div hx-trigger="done" hx-get="/?user={{$.User}}" hx-swap="outerHTML" hx-target="this">

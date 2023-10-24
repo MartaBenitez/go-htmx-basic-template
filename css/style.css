@@ -1,4 +1,4 @@
-.menu{
+.menu {
     display: flex;
     gap: 1rem;
     flex-direction: column;
@@ -6,7 +6,7 @@
     height: 120px;
 }
 
-#pblabel{
+#pblabel {
     margin-left: 1%;
 }
 
@@ -20,55 +20,57 @@
     margin-left: 1%;
 }
 
-.messages{
+.messages {
     height: 50vh;
     overflow-y: scroll;
 }
 
-.message-container{
+.message-container {
     display: flex;
     flex-direction: column;
 }
 
-.message-user{
-    display:flex;
+.message-user {
+    display: flex;
     flex-direction: row-reverse;
     margin-right: 1%;
 }
-.message-user .message-time{
+
+.message-user .message-time {
     align-self: flex-end;
 }
 
-.message-server{
+.message-server {
     flex: 1 1 auto;
     flex-direction: row;
     margin-left: 1%;
 }
 
-.message-time{
+.message-time {
     font-size: small;
     font-style: italic;
     font-weight: lighter;
 }
 
-.message-text{
+.message-text {
     font-size: medium;
     font-weight: bolder;
-    display:flex;
+    display: flex;
     flex-direction: column;
 }
 
 .aspa-cierre {
-    border:1px green solid;
+    border: 1px green solid;
     border-radius: 50%;
     float: right;
     display: block;
     text-align: center;
-    margin:2%;
+    margin: 2%;
     width: 20px;
     height: 20px;
 }
-.aspa-cierre > a{
+
+.aspa-cierre>a {
     cursor: pointer;
     text-decoration: none;
     size: 20px;
@@ -90,21 +92,25 @@
 
 .selectModulo {
     flex: 1 1 auto;
-    display:flex;
+    display: flex;
 }
 
 .nuevaConversacion {
     flex: 1 1 auto;
-    display:flex;
+    display: flex;
 }
 
-.lineaAcciones div{
+.lineaAcciones div {
     display: flex;
     margin-bottom: 2%;
 }
 
-.titulo{
+.titulo {
     flex: 1 1 auto;
-    display:flex;
-    margin-top:3%;
+    display: flex;
+    margin-top: 3%;
+}
+
+.result {
+    display: none;
 }

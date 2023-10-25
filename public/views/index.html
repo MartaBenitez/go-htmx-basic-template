@@ -34,9 +34,7 @@
         if(document.getElementById("buttonAccept")){
             document.getElementById("buttonAccept").addEventListener('htmx:afterRequest', function(event){
                 let id=document.getElementsByClassName("result")[0].innerHTML;
-                let conversaciones= document.getElementsByClassName("message-text");
-                let texto=conversaciones[conversaciones.length-1].innerHTML;
-                parent.window.postMessage({Id:id,Texto:texto},'*');
+                parent.window.postMessage({Id:id,type:'accept'},'*');
             })
         }
 

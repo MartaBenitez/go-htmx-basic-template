@@ -13,7 +13,7 @@ import (
 	"htmx.try/m/v2/pkg/domain/dto"
 )
 
-func GetLastResponse(user string) *domain.Response {
+func GetLastResponse(user string) *dto.BusinessLineData {
 	vals, ok := conn.GetResponses(user)
 	if !ok {
 		return nil

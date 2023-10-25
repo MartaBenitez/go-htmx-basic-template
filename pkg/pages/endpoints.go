@@ -104,8 +104,8 @@ func GetBussinessLine(c echo.Context) error {
 		log.Println("No hay mensaje del servidor")
 		return nil
 	}
-	string, _ := normalize(mensajeServidor.Answer.Text)
-	id := loadBussinessLine(string, respuesta)
+	//string, _ := normalize(mensajeServidor.Answer.Text)
+	id := loadBussinessLine(*respuesta)
 	conversaciones := GetConversations(user)
 
 	return c.Render(http.StatusOK, template, domain.InterfaceResponseFull{
@@ -131,32 +131,32 @@ func normalize(str string) (string, error) {
 }
 
 type DataIn struct {
-	_id      primitive.ObjectID
-	Texto    string
-	Producto *domain.Response
+	_id                primitive.ObjectID
+	Business_line_data dto.BusinessLineData
 }
 
-func loadBussinessLine(textoServidor string, respuesta *domain.Response) string {
-	var introducir = DataIn{_id: primitive.NewObjectID(), Texto: textoServidor, Producto: respuesta}
-	err := SaveJSONData(NewMongoDB(), "copilot", "responses", introducir)
+func loadBussinessLine(respuesta dto.BusinessLineData) string {
+	var introducir = DataIn{_id: primitive.NewObjectID(), Business_line_data: respuesta}
+	val, err := SaveJSONData(NewMongoDB(), "SISnetAI", "Producto", introducir)
 	if err != nil {
 		return introducir._id.Hex()
 	}
-	return introducir._id.Hex()
+	return val
 }
 
-func SaveJSONData(client *mongo.Client, databaseName string, collectionName string, data DataIn) error {
+func SaveJSONData(client *mongo.Client, databaseName string, collectionName string, data DataIn) (string, error) {
 	// Get a handle for your collection
 	collection := client.Database(databaseName).Collection(collectionName)
 
 	// Insert a single document
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	_, err := collection.InsertOne(ctx, data)
+	val, err := collection.InsertOne(ctx, data)
 	if err != nil {
-		return err
+		return "", err
 	}
-	return nil
+	id := strings.Split(fmt.Sprintf("%v", val.InsertedID), "\"")[1]
+	return id, nil
 }
 
 func generateMessage(user string, module string) {
@@ -207,9 +207,9 @@ func requestAnswer(message domain.Message, user string, module string) *string {
 
 	props := AppendProps(sections.Result)
 	mensaje := fmt.Sprintf("Si te he entendido correctamente, quieres que realice cambios sobre la linea de negocio %s, sobre las siguientes secciones:\n -%v", producto, props)
-	//Guardamos respuesta en base de datos
-	response := domain.NewResponse(props, base.Result.Business_line_data)
-	conn.SetResponse(user, response)
+	//Guardamos respuesta en memoria
+
+	conn.SetResponse(user, base.Result.Business_line_data)
 	return &mensaje
 }
 

@@ -29,33 +29,34 @@ type CoverageData struct {
 }
 
 type BusinessLine struct {
-	Ciaascod  string `json:"ciasscod"`
-	Producto  string `json:"producto"`
-	Ramopcod  string `json:"ramopcod"`
-	Flujofor  string `json:"flujofor"`
-	Antidias  int    `json:"antidias"`
-	Cicloren  string `json:"cicloren"`
-	Duracann  int    `json:"duracann"`
-	Descridab string `json:"descridab"`
-	Duractip  string `json:"duractip"`
-	Fechaefe  string `json:"fechaefe"`
-	Fmprocol  string `json:"fmprocol"`
-	Lsfljfor  string `json:"lsfljfor"`
-	Ndiasdps  int    `json:"ndiasdps"`
-	Prodbase  string `json:"prodbase"`
-	Producer  string `json:"producer"`
-	Productip string `json:"productip"`
-	Swactivo  bool   `json:"swactivo"`
-	Swctlcb   bool   `json:"swxtlcb"`
-	Swreacep  bool   `json:"swreacep"`
-	Swsusbpm  bool   `json:"swsusbpm"`
-	Swtramed  bool   `json:"swtramed"`
-	Swtranot  bool   `json:"swtranot"`
-	Swunicue  bool   `json:"swunicue"`
-	Tablabas  string `json:"tablabas"`
-	Tablacom  string `json:"tablacom"`
-	Tipocole  string `json:"tipocole"`
-	Tipoprod  string `json:"tipoprod"`
+	Ciaascod    string `json:"ciasscod"`
+	Producto    string `json:"producto"`
+	Ramopcod    string `json:"ramopcod"`
+	Descripcion string `json:"descripcion"`
+	Flujofor    string `json:"flujofor"`
+	Antidias    int    `json:"antidias"`
+	Cicloren    string `json:"cicloren"`
+	Duracann    int    `json:"duracann"`
+	Descridab   string `json:"descridab"`
+	Duractip    string `json:"duractip"`
+	Fechaefe    string `json:"fechaefe"`
+	Fmprocol    string `json:"fmprocol"`
+	Lsfljfor    string `json:"lsfljfor"`
+	Ndiasdps    int    `json:"ndiasdps"`
+	Prodbase    string `json:"prodbase"`
+	Producer    string `json:"producer"`
+	Productip   string `json:"productip"`
+	Swactivo    bool   `json:"swactivo"`
+	Swctlcb     bool   `json:"swxtlcb"`
+	Swreacep    bool   `json:"swreacep"`
+	Swsusbpm    bool   `json:"swsusbpm"`
+	Swtramed    bool   `json:"swtramed"`
+	Swtranot    bool   `json:"swtranot"`
+	Swunicue    bool   `json:"swunicue"`
+	Tablabas    string `json:"tablabas"`
+	Tablacom    string `json:"tablacom"`
+	Tipocole    string `json:"tipocole"`
+	Tipoprod    string `json:"tipoprod"`
 }
 
 type ProductPaymentMethod struct {
@@ -75,7 +76,7 @@ type CommercialNetworkAttribute struct {
 	Descripcion string `json:"descripcion"`
 	Orden       int    `json:"orden"`
 	Swobliga    bool   `json:"swobliga"`
-	Lenght      int    `json:"lenght"`
+	Length      int    `json:"lenght"`
 	Precision   int    `json:"Precision"`
 	Tipodato    string `json:"tipodato"`
 	Classhelp   string `json:"classhelp"`

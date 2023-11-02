@@ -21,6 +21,7 @@ import (
 	"htmx.try/m/v2/pkg/dbconn"
 	"htmx.try/m/v2/pkg/domain"
 	"htmx.try/m/v2/pkg/domain/dto"
+	"htmx.try/m/v2/pkg/domain/results"
 )
 
 var conn = *dbconn.NewInMemoryDB()
@@ -40,7 +41,7 @@ func Index(c echo.Context) error {
 func StartNewConversation(c echo.Context) error {
 	user := c.QueryParam("user")
 	conn.DeleteData(user)
-	conn.DeleteResponses(user)
+	conn.DeleteBases(user)
 	conversaciones := GetConversations(user)
 	return c.Render(200, template, domain.InterfaceResponseFull{
 		User:          user,
@@ -92,10 +93,10 @@ func CloseActions(c echo.Context) error {
 	})
 }
 
-func GetBussinessLine(c echo.Context) error {
+func AcceptPrompt(c echo.Context) error {
 	user := c.FormValue("user")
-	respuesta := GetLastResponse(user)
-	if respuesta == nil {
+	base := GetLastBase(user)
+	if base == nil {
 		log.Println("No hay respuesta")
 		return nil
 	}
@@ -104,8 +105,8 @@ func GetBussinessLine(c echo.Context) error {
 		log.Println("No hay mensaje del servidor")
 		return nil
 	}
-	//string, _ := normalize(mensajeServidor.Answer.Text)
-	id := loadBussinessLine(*respuesta)
+
+	id := loadBussinessLine(*base)
 	conversaciones := GetConversations(user)
 
 	return c.Render(http.StatusOK, template, domain.InterfaceResponseFull{
@@ -114,7 +115,6 @@ func GetBussinessLine(c echo.Context) error {
 		Id:            id,
 	})
 }
-
 type RespRed struct {
 	_id   string
 	Texto string
@@ -133,10 +133,11 @@ func normalize(str string) (string, error) {
 type DataIn struct {
 	_id                primitive.ObjectID
 	Business_line_data dto.BusinessLineData
+	Coverage_data      []dto.CoverageData
 }
 
-func loadBussinessLine(respuesta dto.BusinessLineData) string {
-	var introducir = DataIn{_id: primitive.NewObjectID(), Business_line_data: respuesta}
+func loadBussinessLine(base results.BaseToSave) string {
+	var introducir = DataIn{_id: primitive.NewObjectID(), Business_line_data: *base.Business_line_data, Coverage_data: *base.Coverage_data}
 	val, err := SaveJSONData(NewMongoDB(), "SISnetAI", "Producto", introducir)
 	if err != nil {
 		return introducir._id.Hex()
@@ -204,12 +205,17 @@ func requestAnswer(message domain.Message, user string, module string) *string {
 	}
 
 	producto := base.Result.Business_line_data.Business_line.Producto
+	secciones := AppendProps(sections.Result)
+	for _, value := range secciones {
+		secciones = append(secciones, value)
+	}
 
-	props := AppendProps(sections.Result)
-	mensaje := fmt.Sprintf("Si te he entendido correctamente, quieres que realice cambios sobre la linea de negocio %s, sobre las siguientes secciones:\n -%v", producto, props)
+	mensaje := fmt.Sprintf("Si te he entendido correctamente, quieres que realice cambios sobre la linea de negocio %s, sobre las siguientes secciones:\n -%v", producto, secciones)
+	
 	//Guardamos respuesta en memoria
+	basetosave := results.BaseToSave{Business_line_data: &base.Result.Business_line_data, Coverage_data: &base.Result.Coverage_data}
 
-	conn.SetResponse(user, base.Result.Business_line_data)
+	conn.SetBase(user, basetosave)
 	return &mensaje
 }
 
@@ -231,6 +237,7 @@ func getBase(message string) (*dto.Base, error) {
 		log.Println("Impossible to build request: " + err.Error())
 		return nil, err
 	}
+
 	if res.StatusCode == 200 {
 		resBody, err := io.ReadAll(res.Body)
 		if err != nil {
@@ -250,10 +257,10 @@ func getBase(message string) (*dto.Base, error) {
 	error := errors.New("Error: response received with status code " + res.Status)
 	log.Println(error.Error())
 	return nil, error
-
 }
 
 func getSections(message string, module string) (*dto.SectionsToEdit, error) {
+
 	res, err := http.Get(url + "sections_to_edit?query=" + message + "&module=" + module)
 	if err != nil {
 		log.Println("Impossible to build request: " + err.Error())
@@ -272,11 +279,9 @@ func getSections(message string, module string) (*dto.SectionsToEdit, error) {
 			log.Println("Impossible to parse the response " + err.Error())
 			return nil, err
 		}
-
 		return &response, nil
 	}
 
 	error := errors.New("Error: response received with status code " + res.Status)
-	log.Println(error.Error())
 	return nil, error
 }

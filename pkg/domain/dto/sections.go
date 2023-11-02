@@ -7,11 +7,9 @@ type SectionsToEdit struct {
 }
 
 type ResultSections struct {
-	BusinessLine               string `json:"BusinessLine"`
-	BusinessLineData           string `json:"BusinessLineData"`
-	CommercialNetworkAttribute string `json:"CommercialNetworkAttribute"`
-	ProductPaymentMethod       string `json:"ProductPaymentMethod"`
-	ProductRenewalCycle        string `json:"ProductRenewalCycle"`
-	RenewalParameter           string `json:"RenewalParameter"`
-	
+	BusinessLine               string `json:"business_line"`
+	CommercialNetworkAttribute string `json:"commercial_network_attribute"`
+	ProductPaymentMethod       string `json:"product_payment_method"`
+	ProductRenewalCycle        string `json:"product_renewal_cycle"`
+	RenewalParameter           string `json:"renewal_parameter"`
 }

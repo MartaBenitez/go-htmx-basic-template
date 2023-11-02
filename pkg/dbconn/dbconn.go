@@ -2,18 +2,18 @@ package dbconn
 
 import (
 	"htmx.try/m/v2/pkg/domain"
-	"htmx.try/m/v2/pkg/domain/dto"
+	"htmx.try/m/v2/pkg/domain/results"
 )
 
 type InMemoryDB struct {
-	data      map[string]domain.InterfaceResponseFull
-	responses map[string][]dto.BusinessLineData
+	data map[string]domain.InterfaceResponseFull
+	base map[string][]results.BaseToSave
 }
 
 func NewInMemoryDB() *InMemoryDB {
 	return &InMemoryDB{
-		data:      make(map[string]domain.InterfaceResponseFull),
-		responses: make(map[string][]dto.BusinessLineData),
+		data: make(map[string]domain.InterfaceResponseFull),
+		base: make(map[string][]results.BaseToSave),
 	}
 }
 
@@ -30,15 +30,15 @@ func (db *InMemoryDB) DeleteData(key string) {
 	delete(db.data, key)
 }
 
-func (db *InMemoryDB) GetResponses(key string) ([]dto.BusinessLineData, bool) {
-	val, ok := db.responses[key]
+func (db *InMemoryDB) GetBases(key string) ([]results.BaseToSave, bool) {
+	val, ok := db.base[key]
 	return val, ok
 }
 
-func (db *InMemoryDB) SetResponse(key string, value dto.BusinessLineData) {
-	db.responses[key] = append(db.responses[key], value)
+func (db *InMemoryDB) SetBase(key string, value results.BaseToSave) {
+	db.base[key] = append(db.base[key], value)
 }
 
-func (db *InMemoryDB) DeleteResponses(key string) {
-	delete(db.responses, key)
+func (db *InMemoryDB) DeleteBases(key string) {
+	delete(db.base, key)
 }

@@ -29,7 +29,7 @@ type CoverageData struct {
 }
 
 type BusinessLine struct {
-	Ciaascod    string `json:"ciasscod"`
+	Ciaascod    string `json:"ciaascod"`
 	Producto    string `json:"producto"`
 	Ramopcod    string `json:"ramopcod"`
 	Descripcion string `json:"descripcion"`

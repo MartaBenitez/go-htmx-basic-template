@@ -71,9 +71,9 @@ func NewMongoDB() *mongo.Client {
 	return client
 }
 
-func RecoverExample() *dto.Base {
-	var respuesta dto.Base
-	raw, err := os.ReadFile("/home/usuario/Escritorio/ejemlocob.json")
+func RecoverExample() *dto.BusinessLineData {
+	var respuesta dto.BusinessLineData
+	raw, err := os.ReadFile("/home/usuario/Escritorio/ejemploCob.json")
 	if err != nil {
 		fmt.Println(err.Error())
 	}
@@ -81,7 +81,7 @@ func RecoverExample() *dto.Base {
 	return &respuesta
 }
 
-func AppendProps(prop dto.ResultSections) []string {
+/*func AppendProps(prop dto.ResultSections) []string {
 	var props []string
 	if prop.BusinessLine != "" {
 		props = append(props, "Business Line")
@@ -100,4 +100,4 @@ func AppendProps(prop dto.ResultSections) []string {
 	}
 
 	return props
-}
+}*/

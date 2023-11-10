@@ -11,10 +11,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"htmx.try/m/v2/pkg/domain"
 	"htmx.try/m/v2/pkg/domain/dto"
-	"htmx.try/m/v2/pkg/domain/results"
 )
 
-func GetLastBase(user string) *results.BaseToSave {
+var mongoUri = "mongodb://root:example@20.56.93.5:27017"
+
+func GetLastBase(user string) *domain.BaseToSave {
 	vals, ok := conn.GetBases(user)
 	if !ok {
 		return nil
@@ -52,7 +53,7 @@ func GetConversations(user string) []domain.Conversation {
 
 func NewMongoDB() *mongo.Client {
 	// Set client options
-	clientOptions := options.Client().ApplyURI("mongodb://root:example@20.56.93.5:27017")
+	clientOptions := options.Client().ApplyURI(mongoUri)
 
 	// Connect to MongoDB
 	client, err := mongo.Connect(context.Background(), clientOptions)

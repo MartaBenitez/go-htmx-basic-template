@@ -6,9 +6,10 @@ type Base struct {
 }
 
 type Result struct {
-	Description        string           `json:"description"`
-	Business_line_data BusinessLineData `json:"business_line_data"`
-	Coverage_data      []CoverageData   `json:"coverage_data"`
+	Description           string                 `json:"description"`
+	Business_line_data    BusinessLineData       `json:"business_line_data"`
+	Coverage_data         []CoverageData         `json:"coverage_data"`
+	Tecnical_product_data []TechnicalProductData `json:"technical_product_data"`
 }
 
 type BusinessLineData struct {
@@ -23,7 +24,7 @@ type CoverageData struct {
 	Coverage                    Coverage                    `json:"coverage"`
 	Capital                     []Capital                   `json:"capital"`
 	Coverage_concept            []CoverageConcept           `json:"coverage_concept"`
-	Deductible                  []Deductible                `json:"deductible"`
+	Franchise                   []Franchise                 `json:"franchise"`
 	Subcoverage                 []Subcoverage               `json:"subcoverage"`
 	Temporary_premium_reduction []TemporaryPremiumReduction `json:"temporary_premium_reduction"`
 }
@@ -145,7 +146,7 @@ type CoverageConcept struct {
 	Gastocob  int    `json:"gastocob"`
 }
 
-type Deductible struct {
+type Franchise struct {
 	Codifran    string `json:"codifran"`
 	Descripcion string `json:"descripcion"`
 	Diasfran    string `json:"diasfran"`
@@ -164,4 +165,195 @@ type Subcoverage struct {
 type TemporaryPremiumReduction struct {
 	Diasanti int `json:"diasanti"`
 	Porcprim int `json:"porcprim"`
+}
+
+type TechnicalProductData struct {
+	Technical_product          TechnicalProduct           `json:"technical_product"`
+	Technical_product_coverage []TechnicalProductCoverage `json:"technical_product_coverage"`
+	Commercial_offer           []CommercialOffer          `json:"commercial_offer"`
+}
+
+type TechnicalProduct struct {
+	Modalcod     string `json:"modalcod"`
+	Cuessalu     string `json:"cuessalu"`
+	Cicloren     string `json:"cicloren"`
+	Swunica      bool   `json:"swunica"`
+	Basestec     string `json:"basestec"`
+	Ffincome     string `json:"ffincome"`
+	Fechalta     string `json:"fechalta"`
+	Duractip     string `json:"duractip"`
+	Ramopcod     string `json:"ramopcod"`
+	Swmensual    bool   `json:"swmensual"`
+	Swanual      bool   `json:"swanual"`
+	Swsemestral  bool   `json:"swsemestral"`
+	Swtrimestral bool   `json:"swtrimestral"`
+	Tipomoda     string `json:"tipomoda"`
+	Orden        int    `json:"orden"`
+	Descripcion  string `json:"descripcion"`
+}
+
+type TechnicalProductCoverage struct {
+	Garancod string `json:"garancod"`
+	Orden    int    `json:"orden"`
+	Fechaefe string `json:"fechaefe"`
+	Fechbaja string `json:"fechbaja"`
+	Swobliga bool   `json:"swobliga"`
+	Basestec string `json:"basestec"`
+	Modalcob string `json:"modalcob"`
+	Modulcob string `json:"modulcob"`
+	Garappal string `json:"garappal"`
+	Porcappi int    `json:"porcappi"`
+	Tipocapi string `json:"tipocapi"`
+	Tipodfra string `json:"tipodfra"`
+	Capitmax int    `json:"capitmax"`
+	Capitmin int    `json:"capitmin"`
+	Tiporeva string `json:"tiporeva"`
+	Revalpor int    `json:"revalpor"`
+	Listacap string `json:"listacap"`
+	Listafra string `json:"listafra"`
+	Edadmini int    `json:"edadmini"`
+	Edadsali int    `json:"edadsali"`
+	Edadmaxi int    `json:"edadmaxi"`
+	Capiaseg int    `json:"capiaseg"`
+	Swambpol bool   `json:"swambpol"`
+}
+type CommercialOffer struct {
+	Swcobper                  bool                      `json:"swcobper"`
+	Fechaven                  string                    `json:"fechaven"`
+	Basestec                  string                    `json:"basestec"`
+	Fechaefe                  string                    `json:"fechaefe"`
+	Puntomax                  int                       `json:"puntomax"`
+	Tablaren                  string                    `json:"tablaren"`
+	Swpolmar                  bool                      `json:"swpolmar"`
+	Orden                     int                       `json:"orden"`
+	Reembolso                 bool                      `json:"reembolso"`
+	Swanual                   bool                      `json:"swanual"`
+	Swsemestral               bool                      `json:"swsemestral"`
+	Swtrimestral              bool                      `json:"swtrimestral"`
+	Swunicue                  bool                      `json:"swunicue"`
+	Cuessalu                  string                    `json:"cuessalu"`
+	Swunica                   bool                      `json:"swunica"`
+	Impofran                  int                       `json:"impofran"`
+	Cobeprsa                  string                    `json:"cobeprsa"`
+	Swbimestral               bool                      `json:"swbimestral"`
+	Swactivo                  bool                      `json:"swactivo"`
+	Swmensual                 bool                      `json:"swmensual"`
+	Combicod                  string                    `json:"combicod"`
+	Tipococo                  string                    `json:"tipococo"`
+	Descripcion               string                    `json:"descripcion"`
+	Ramopcod                  string                    `json:"ramopcod"`
+	Swtramed                  bool                      `json:"swtramed"`
+	Prefinum                  string                    `json:"prefinum"`
+	Cgestora                  string                    `json:"cgestora"`
+	Cccgesto                  string                    `json:"cccgesto"`
+	Distribution_channel      []Distribution            `json:"distribution_channel"`
+	Indexed_link_payment_date []IndexedLinkPaymentDate  `json:"indexed_link_payment_date"`
+	InvestmentFund            []InvestmentFund          `json:"investment_fund"`
+	Venture_capital           []VentureCapital          `json:"venture_capital"`
+	Variable_data             []VariableData            `json:"variable_data"`
+	Commercial_offer_coverage []CommercialOfferCoverage `json:"commercial_offer_coverage"`
+}
+
+type Distribution struct {
+	Canalmed string `json:"canalmed"`
+}
+
+type IndexedLinkPaymentDate struct {
+	Fechpago string `json:"fechpago"`
+	Fechaob1 string `json:"fechaob1"`
+	Fechaob2 string `json:"fechaob2"`
+	Fechaob3 string `json:"fechaob3"`
+	Fechaob4 string `json:"fechaob4"`
+	Cupon    int    `json:"cupon"`
+}
+
+type InvestmentFund struct {
+	Fondoinv    string `json:"fondoinv"`
+	Descripcion string `json:"descripcion"`
+}
+
+type VentureCapital struct {
+	Capiries   string `json:"capiries"`
+	Orden      int    `json:"orden"`
+	Swobliga   bool   `json:"swobliga"`
+	Swreadonly bool   `json:"swreadonly"`
+	Eonblur    string `json:"eonblur"`
+}
+
+type VariableData struct {
+	Nombdato string `json:"nombdato"`
+	Orden    int    `json:"orden"`
+	Swobliga bool   `json:"swobliga"`
+}
+
+type CommercialOfferCoverage struct {
+	Numevers       int                `json:"numevers"`
+	Garancod       string             `json:"garancod"`
+	Orden          int                `json:"orden"`
+	Swmodifi       bool               `json:"swmodifi"`
+	Swhide         bool               `json:"swhide"`
+	Swcapita       bool               `json:"swcapita"`
+	Swhidden       bool               `json:"swhidden"`
+	Swoption       bool               `json:"swoption"`
+	Cobepmax       int                `json:"cobepmax"`
+	Cobepmin       int                `json:"cobepmin"`
+	Basegral       string             `json:"basegral"`
+	Compotar       string             `json:"compotar"`
+	Swsercob       bool               `json:"swsercob"`
+	Swtarifa       bool               `json:"swtarifa"`
+	Cotarifa       string             `json:"cotarifa"`
+	Fechaefe       string             `json:"fechaefe"`
+	Fechbaja       string             `json:"fechbaja"`
+	Swobliga       bool               `json:"swobliga"`
+	Basestec       string             `json:"basestec"`
+	Modalcob       string             `json:"modalcob"`
+	Modulcob       string             `json:"modulcob"`
+	Garappal       string             `json:"garappal"`
+	Porcappi       int                `json:"porcappi"`
+	Tipocapi       string             `json:"tipocapi"`
+	Tipodfra       string             `json:"tipodfra"`
+	Capitmax       int                `json:"capitmax"`
+	Capitmin       int                `json:"capitmin"`
+	Tiporeva       string             `json:"tiporeva"`
+	Revalpor       int                `json:"revalpor"`
+	Listacap       string             `json:"listacap"`
+	Listafra       string             `json:"listafra"`
+	Edadmini       int                `json:"edadmini"`
+	Edadsali       int                `json:"edadsali"`
+	Edadmaxi       int                `json:"edadmaxi"`
+	Capiaseg       int                `json:"capiaseg"`
+	Swambpol       bool               `json:"swambpol"`
+	Limit          []Limit            `json:"limit"`
+	Waiting_period []WaitingPeriod    `json:"waiting_period"`
+	Partial_value  []PartialValue     `json:"partial_value"`
+	Capital        []CapitalComercial `json:"capital"`
+}
+
+type Limit struct {
+	Numevers int `json:"numevers"`
+	Capitmax int `json:"capitmax"`
+	Capitmin int `json:"capitmin"`
+}
+
+type WaitingPeriod struct {
+	Numevers  int    `json:"numevers"`
+	Carencia  string `json:"carencia"`
+	Swdefault bool   `json:"swdefault"`
+}
+
+type PartialValue struct {
+	Numevers    int    `json:"numevers"`
+	Codigo      string `json:"codigo"`
+	Orden       int    `json:"orden"`
+	Valorpar    int    `json:"valorpar"`
+	Descripcion string `json:"descripcion"`
+}
+
+type CapitalComercial struct {
+	Numevers    int    `json:"numevers"`
+	Capital     int    `json:"capital"`
+	Descripcion string `json:"descripcion"`
+	Tcapgara    string `json:"tcapgara"`
+	Swdefault   bool   `json:"swdefault"`
+	Formcapi    string `json:"formcapi"`
 }

@@ -2,18 +2,17 @@ package dbconn
 
 import (
 	"htmx.try/m/v2/pkg/domain"
-	"htmx.try/m/v2/pkg/domain/results"
 )
 
 type InMemoryDB struct {
 	data map[string]domain.InterfaceResponseFull
-	base map[string][]results.BaseToSave
+	base map[string][]domain.BaseToSave
 }
 
 func NewInMemoryDB() *InMemoryDB {
 	return &InMemoryDB{
 		data: make(map[string]domain.InterfaceResponseFull),
-		base: make(map[string][]results.BaseToSave),
+		base: make(map[string][]domain.BaseToSave),
 	}
 }
 
@@ -30,12 +29,12 @@ func (db *InMemoryDB) DeleteData(key string) {
 	delete(db.data, key)
 }
 
-func (db *InMemoryDB) GetBases(key string) ([]results.BaseToSave, bool) {
+func (db *InMemoryDB) GetBases(key string) ([]domain.BaseToSave, bool) {
 	val, ok := db.base[key]
 	return val, ok
 }
 
-func (db *InMemoryDB) SetBase(key string, value results.BaseToSave) {
+func (db *InMemoryDB) SetBase(key string, value domain.BaseToSave) {
 	db.base[key] = append(db.base[key], value)
 }
 

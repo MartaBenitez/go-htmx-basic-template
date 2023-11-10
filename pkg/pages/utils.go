@@ -1,19 +1,15 @@
 package pages
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"htmx.try/m/v2/pkg/domain"
 	"htmx.try/m/v2/pkg/domain/dto"
 )
 
-var mongoUri = "mongodb://root:example@20.56.93.5:27017"
+//var mongoUri = "mongodb://root:example@20.56.93.5:27017"
 
 func GetLastBase(user string) *domain.BaseToSave {
 	vals, ok := conn.GetBases(user)
@@ -51,7 +47,7 @@ func GetConversations(user string) []domain.Conversation {
 	return val.Conversations
 }
 
-func NewMongoDB() *mongo.Client {
+/*func NewMongoDB() *mongo.Client {
 	// Set client options
 	clientOptions := options.Client().ApplyURI(mongoUri)
 
@@ -70,7 +66,7 @@ func NewMongoDB() *mongo.Client {
 	fmt.Println("Connected to MongoDB!")
 
 	return client
-}
+}*/
 
 func RecoverExample() *dto.BusinessLineData {
 	var respuesta dto.BusinessLineData

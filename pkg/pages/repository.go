@@ -2,18 +2,15 @@ package pages
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
-	"strings"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
 	"htmx.try/m/v2/pkg/domain"
 	"htmx.try/m/v2/pkg/domain/dto"
 )
@@ -69,14 +66,14 @@ func requestAnswer(message domain.Message, user string, module string) *string {
 
 	producto := base.Result.Business_line_data.Business_line.Producto
 	var secciones []string
-	for _, value := range sections.Body.MAPISECTOEDIT.Sections {
+	for _, value := range sections.NAPISALSECTOEDIT.Sections_to_edit.Sections{
 		secciones = append(secciones, value.Section_code)
 	}
 
 	mensaje := fmt.Sprintf("Si te he entendido correctamente, quieres que realice cambios sobre la linea de negocio %s, sobre las siguientes secciones:\n -%v", producto, secciones)
 
 	//Guardamos respuesta en memoria
-	basetosave := domain.NewBaseToSave("business_line",sections.Body.MAPISECTOEDIT, base.Result.Business_line_data, base.Result.Coverage_data)
+	basetosave := domain.NewBaseToSave("business_line", sections.NAPISALSECTOEDIT.Sections_to_edit, base.Result.Business_line_data, base.Result.Coverage_data, base.Result.Tecnical_product_data)
 	conn.SetBase(user, basetosave)
 	return &mensaje
 }
@@ -89,7 +86,7 @@ func getBase(message string) (*dto.Base, error) {
 		log.Println("Impossible to build request: " + err.Error())
 		return nil, err
 	}
-		fmt.Println(urlMock)
+	fmt.Println(urlMock)
 	res, err := http.Post(urlMock+endpointBase, "application/json", bytes.NewBuffer(body))
 	if err != nil {
 		log.Println("Impossible to do request: " + err.Error())
@@ -109,6 +106,8 @@ func getBase(message string) (*dto.Base, error) {
 			log.Println("Impossible to parse the response " + err.Error())
 			return nil, err
 		}
+		log.Println("------------Base----------")
+		log.Println(response)
 		return &response, nil
 	}
 
@@ -138,6 +137,8 @@ func getSections(message string, module string) (*dto.SectionsToEdit, error) {
 			log.Println("Impossible to parse the response " + err.Error())
 			return nil, err
 		}
+		log.Println("------------Secciones----------")
+		log.Println(response)
 		return &response, nil
 	}
 
@@ -145,7 +146,7 @@ func getSections(message string, module string) (*dto.SectionsToEdit, error) {
 	return nil, error
 }
 
-func LoadBussinessLine(base dto.BusinessLineResp) string {
+/*func LoadBussinessLine(base dto.BusinessLineResp) string {
 	var introducir = DataIn{_id: primitive.NewObjectID(), Business_line_data: base.Result}
 	val, err := SaveJSONData(NewMongoDB(), "SISnetAI", "Producto", introducir)
 	if err != nil {
@@ -167,9 +168,9 @@ func SaveJSONData(client *mongo.Client, databaseName string, collectionName stri
 	}
 	id := strings.Split(fmt.Sprintf("%v", val.InsertedID), "\"")[1]
 	return id, nil
-}
+}*/
 
-func GetBusinessLine(base dto.BusinessLineData, section dto.Sections, module string) (*dto.BusinessLineResp, error) {
+func GetBusinessLine(base dto.BusinessLineData, section dto.Sections, module string) (*dto.IdMongo, error) {
 	vara, err := json.Marshal(base)
 	if err != nil {
 		log.Println("No ha podido hacer el marshal bien")
@@ -191,12 +192,14 @@ func GetBusinessLine(base dto.BusinessLineData, section dto.Sections, module str
 		if err != nil {
 			log.Println("Impossible to read all body of response " + err.Error())
 		}
-		var response dto.BusinessLineResp
+		var response dto.IdMongo
 		err = json.Unmarshal(resBody, &response)
 		if err != nil {
 			log.Println("Impossible to parse the response " + err.Error())
 			return nil, err
 		}
+		log.Println("------------Linea Negocio----------")
+		log.Println(response)
 		return &response, nil
 	}
 

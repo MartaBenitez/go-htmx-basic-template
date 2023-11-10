@@ -8,6 +8,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"htmx.try/m/v2/pkg/dbconn"
 	"htmx.try/m/v2/pkg/domain"
+	"htmx.try/m/v2/pkg/domain/dto"
 )
 
 var conn = *dbconn.NewInMemoryDB()
@@ -92,21 +93,33 @@ func AcceptPrompt(c echo.Context) error {
 		return nil
 	}
 
-	//switch del modulo
-	
-	lineaNegocio, err := GetBusinessLine(base.Business_line_data, base.SectionsToEdit, "business_line")
+	var err error
+	var id *dto.IdMongo
 
+	//switch del modulo
+	switch(base.Module){
+		case "business_line":
+			id, err = GetBusinessLine(base.Business_line_data, base.SectionsToEdit, "business_line")
+			break;
+		case "coverage":
+			//id, err = GetCoverage(base.Coverage_data, base.SectionsToEdit, "coverage")
+			break;
+		case "technical_product":
+			//id, err = GetTechnicalProduct(base.Technical_product, base.SectionsToEdit, "technical_product")
+			break;
+	}
+	
+	
 	if err != nil {
 		log.Println(err)
 		return nil
 	}
 
-	id := LoadBussinessLine(*lineaNegocio)
 	conversaciones := GetConversations(user)
 
 	return c.Render(http.StatusOK, template, domain.InterfaceResponseFull{
 		User:          user,
 		Conversations: conversaciones,
-		Id:            id,
+		Id:            id.Result.Lob_id,
 	})
 }

@@ -1,13 +1,14 @@
 package dto
 
 type SectionsToEdit struct {
-	Header interface{} `json:"header"`
-	Body   Codigo      `json:"body"`
+	NAPISALSECTOEDIT SectionsEdit `json:"NAPISALSECTOEDIT"`
 }
 
-type Codigo struct {
-	MAPISECTOEDIT Sections `json:"MAPISECTOEDIT"`
+type SectionsEdit struct {
+	Sections_to_edit Sections `json:"sections_to_edit"`
+	Id_query         string   `json:"id_query"`
 }
+
 type Sections struct {
 	Sections []Section `json:"sections"`
 }
